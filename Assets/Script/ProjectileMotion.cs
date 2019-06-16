@@ -10,6 +10,8 @@ public class ProjectileMotion : MonoBehaviour
     public Transform projectile;
     private Transform myTransform;
 
+    public bool isActive;
+
     void Awake()
     {
         myTransform = transform;
@@ -17,14 +19,23 @@ public class ProjectileMotion : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(SimulateProjectile());
+        isActive = false;
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0) && !isActive)
+        {
+            isActive = true;
+            StartCoroutine(SimulateProjectile());
+        }
     }
 
 
     IEnumerator SimulateProjectile()
     {
-        // Short delay added before Projectile is thrown
-        yield return new WaitForSeconds(1.5f);
+        //// Short delay added before Projectile is thrown
+        //yield return new WaitForSeconds(1.5f);
 
         // Move projectile to the position of throwing object + add some offset if needed.
         projectile.position = myTransform.position + new Vector3(0, 0.0f, 0);
@@ -55,5 +66,7 @@ public class ProjectileMotion : MonoBehaviour
 
             yield return null;
         }
+
+        isActive = false;
     }
 }
