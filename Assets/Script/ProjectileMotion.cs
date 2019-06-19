@@ -3,19 +3,12 @@ using UnityEngine;
 
 public class ProjectileMotion : MonoBehaviour
 {
+    public Transform projectile;
     public Transform Target;
     public float firingAngle = 45.0f;
     public float gravity = 9.8f;
 
-    public Transform projectile;
-    private Transform myTransform;
-
     public bool isActive;
-
-    void Awake()
-    {
-        myTransform = transform;
-    }
 
     void Start()
     {
@@ -34,36 +27,31 @@ public class ProjectileMotion : MonoBehaviour
 
     IEnumerator SimulateProjectile()
     {
-        //// Short delay added before Projectile is thrown
-        //yield return new WaitForSeconds(1.5f);
 
-        // Move projectile to the position of throwing object + add some offset if needed.
-        projectile.position = myTransform.position + new Vector3(0, 0.0f, 0);
+        projectile.position = transform.position + new Vector3(0, 0.0f, 0);
 
-        // Calculate distance to target
-        float target_Distance = Vector3.Distance(projectile.position, Target.position);
+        // Calculate distance between projectile and target
+        float targetDistance = Vector3.Distance(projectile.position, Target.position);
 
-        // Calculate the velocity needed to throw the object to the target at specified angle.
-        float projectile_Velocity = target_Distance / (Mathf.Sin(2 * firingAngle * Mathf.Deg2Rad) / gravity);
+        // Calculate the velocity to throw object to target at specified angle.
+        float projectileDistance = targetDistance / (Mathf.Sin(2 * firingAngle * Mathf.Deg2Rad) / gravity);
 
-        // Extract the X  Y componenent of the velocity
-        float Vx = Mathf.Sqrt(projectile_Velocity) * Mathf.Cos(firingAngle * Mathf.Deg2Rad);
-        float Vy = Mathf.Sqrt(projectile_Velocity) * Mathf.Sin(firingAngle * Mathf.Deg2Rad);
+        // Velocity of X Y
+        float velocityX = Mathf.Sqrt(projectileDistance) * Mathf.Cos(firingAngle * Mathf.Deg2Rad);
+        float velocityY = Mathf.Sqrt(projectileDistance) * Mathf.Sin(firingAngle * Mathf.Deg2Rad);
 
         // Calculate flight time.
-        float flightDuration = target_Distance / Vx;
+        float flightDuration = targetDistance / velocityX;
 
-        // Rotate projectile to face the target.
+        // Projectile face at target.
         projectile.rotation = Quaternion.LookRotation(Target.position - projectile.position);
 
         float elapse_time = 0;
 
         while (elapse_time < flightDuration)
         {
-            projectile.Translate(0, (Vy - (gravity * elapse_time)) * Time.deltaTime, Vx * Time.deltaTime);
-
+            projectile.Translate(0, (velocityY - (gravity * elapse_time)) * Time.deltaTime, velocityX * Time.deltaTime);
             elapse_time += Time.deltaTime;
-
             yield return null;
         }
 
